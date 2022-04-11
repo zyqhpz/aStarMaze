@@ -1,4 +1,4 @@
-from pyamaze import maze, agent, textLabel
+from pymaze import maze, agent, textLabel
 from queue import PriorityQueue
 
 
@@ -51,7 +51,7 @@ def aStar(m):
 
 
 if __name__ == '__main__':
-    m = maze(5, 5)
+    m = maze(50, 50)
     m.CreateMaze()
     path = aStar(m)
 
