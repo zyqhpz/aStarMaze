@@ -57,7 +57,7 @@ class agent:
     They can have two shapes (square or arrow)
     '''
 
-    def __init__(self, parentMaze, x=None, y=None, shape='square', goal=None, filled=False, footprints=False, color: COLOR = COLOR.blue):
+    def __init__(self, parentMaze, x=None, y=None, shape='square', start=None, goal=None, filled=False, footprints=False, color: COLOR = COLOR.blue):
         '''
         parentmaze-->  The maze on which agent is placed.
         x,y-->  Position of the agent i.e. cell inside which agent will be placed
@@ -98,6 +98,10 @@ class agent:
         self.y = y
         self.footprints = footprints
         self._parentMaze._agents.append(self)
+        if start == None:
+            self.start = self._parentMaze._start
+        else:
+            self.start = start
         if goal == None:
             self.goal = self._parentMaze._goal
         else:
@@ -382,7 +386,13 @@ class maze:
         if x+1 <= self.rows:
             self.maze_map[x+1, y]['N'] = 1
 
-    def CreateMaze(self, x=1, y=1, pattern=None, loopPercent=0, saveMaze=False, loadMaze=None, theme: COLOR = COLOR.dark):
+    # set default start point is always bottom right
+    def _setStart(self, x, y):
+        self.maze_map[x, y]['S'] = 1
+        if x+1 <= self.rows:
+            self.maze_map[x+1, y]['N'] = 1
+            
+    def CreateMaze(self, x=1, y=1, a=None, b=None, pattern=None, loopPercent=0, saveMaze=False, loadMaze=None, theme: COLOR = COLOR.dark):
         '''
         One very important function to create a Random Maze
         pattern-->  It can be 'v' for vertical or 'h' for horizontal
@@ -399,6 +409,7 @@ class maze:
         _closed = []
         self.theme = theme
         self._goal = (x, y)
+        self._start = (a, b)
         if(isinstance(theme, str)):
             if(theme in COLOR.__members__):
                 self.theme = COLOR[theme]
@@ -648,7 +659,8 @@ class maze:
             self.path = BFS((self.rows, self.cols))
         self._drawMaze(self.theme)
         agent(self, *self._goal, shape='square',
-              filled=True, color=COLOR.green)
+              filled=True, color=COLOR.blue)
+        agent(self, *self._start, shape='square',filled=True, color=COLOR.red)
         if saveMaze:
             dt_string = datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")
             with open(f'maze--{dt_string}.csv', 'w', newline='') as f:
@@ -670,7 +682,7 @@ class maze:
 
         self._LabWidth = 26  # Space from the top for Labels
         self._win = Tk()
-        # self._win.state('zoomed')
+        self._win.state('zoomed')
         self._win.title('PYTHON MAZE WORLD by Learning Orbis')
 
         scr_width = self._win.winfo_screenwidth()

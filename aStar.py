@@ -1,57 +1,59 @@
-from pyamaze import maze,agent,textLabel
+from pymaze import *
 from queue import PriorityQueue
-def h(cell1,cell2):
-    x1,y1=cell1
-    x2,y2=cell2
+
+def h(cell_1, cell_2):
+    x1, y1 = cell_1
+    x2, y2 = cell_2
 
     return abs(x1-x2) + abs(y1-y2)
-def aStar(m):
-    start=(m.rows,m.cols)
-    g_score={cell:float('inf') for cell in m.grid}
-    g_score[start]=0
-    f_score={cell:float('inf') for cell in m.grid}
-    f_score[start]=h(start,(1,1))
 
-    open=PriorityQueue()
-    open.put((h(start,(1,1)),h(start,(1,1)),start))
-    aPath={}
+def aStar(maze):
+    start = (maze.rows, maze.cols)
+    g_score = {cell: float('inf') for cell in maze.grid}
+    g_score[start] = 0
+    f_score = {cell: float('inf') for cell in maze.grid}
+    f_score[start] = h(start, (1, 1))
+
+    open = PriorityQueue()
+    open.put((h(start, (1, 1)), h(start, (1, 1)), start))
+    aPath = {}
     while not open.empty():
-        currCell=open.get()[2]
-        if currCell==(1,1):
+        currCell = open.get()[2]
+        if currCell == (1, 1):
             break
         for d in 'ESNW':
-            if m.maze_map[currCell][d]==True:
-                if d=='E':
-                    childCell=(currCell[0],currCell[1]+1)
-                if d=='W':
-                    childCell=(currCell[0],currCell[1]-1)
-                if d=='N':
-                    childCell=(currCell[0]-1,currCell[1])
-                if d=='S':
-                    childCell=(currCell[0]+1,currCell[1])
+            if maze.maze_map[currCell][d] == True:
+                if d == 'E':
+                    childCell = (currCell[0], currCell[1]+1)
+                if d == 'W':
+                    childCell = (currCell[0], currCell[1]-1)
+                if d == 'N':
+                    childCell = (currCell[0]-1, currCell[1])
+                if d == 'S':
+                    childCell = (currCell[0]+1, currCell[1])
 
-                temp_g_score=g_score[currCell]+1
-                temp_f_score=temp_g_score+h(childCell,(1,1))
+                temp_g_score = g_score[currCell]+1
+                temp_f_score = temp_g_score+h(childCell, (1, 1))
 
                 if temp_f_score < f_score[childCell]:
-                    g_score[childCell]= temp_g_score
-                    f_score[childCell]= temp_f_score
-                    open.put((temp_f_score,h(childCell,(1,1)),childCell))
-                    aPath[childCell]=currCell
-    fwdPath={}
-    cell=(1,1)
-    while cell!=start:
-        fwdPath[aPath[cell]]=cell
-        cell=aPath[cell]
+                    g_score[childCell] = temp_g_score
+                    f_score[childCell] = temp_f_score
+                    open.put((temp_f_score, h(childCell, (1, 1)), childCell))
+                    aPath[childCell] = currCell
+    fwdPath = {}
+    cell = (1, 1)
+    while cell != start:
+        fwdPath[aPath[cell]] = cell
+        cell = aPath[cell]
     return fwdPath
 
-if __name__=='__main__':
-    m=maze(5,5)
-    m.CreateMaze()
-    path=aStar(m)
+if __name__ == '__main__':
+    m = maze(6, 6)
+    m.CreateMaze(loadMaze='maze.csv')
+    path = aStar(m)
 
-    a=agent(m,footprints=True)
-    m.tracePath({a:path})
-    l=textLabel(m,'A Star Path Length',len(path)+1)
+    a = agent(m, footprints=True, shape='arrow', filled=True, color='green', start=(6,6))
+    m.tracePath({a: path})
+    l = textLabel(m, 'A Star Path Length', len(path)+1)
 
     m.run()
