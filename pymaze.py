@@ -385,12 +385,6 @@ class maze:
         self.maze_map[x, y]['S'] = 1
         if x+1 <= self.rows:
             self.maze_map[x+1, y]['N'] = 1
-
-    # set default start point is always bottom right
-    def _setStart(self, x, y):
-        self.maze_map[x, y]['S'] = 1
-        if x+1 <= self.rows:
-            self.maze_map[x+1, y]['N'] = 1
             
     def CreateMaze(self, x=1, y=1, a=None, b=None, pattern=None, loopPercent=0, saveMaze=False, loadMaze=None, theme: COLOR = COLOR.dark):
         '''
